@@ -67,7 +67,7 @@ exports.runQuery = function(client, query, querySender, queryRoom) {
                     }
                 });
                 var netGold = goldwon - goldspent;
-                message = "During your " + runs + " runs, " + querySender;
+                message = "In " + runs + " runs, " + querySender;
                 if(netGold >= 0)
                     message += " won " + netGold + " gold, " + c_unco + " uncommon cards and " + c_rare + " rare cards!";
                 else
@@ -78,7 +78,24 @@ exports.runQuery = function(client, query, querySender, queryRoom) {
         });
     }
     else if(query == "undo") {
-        
+        db.get("SELECT * FROM qc_runs WHERE player=? ORDER BY run_date DESC LIMIT 0,1", querySender, function(err, row) {
+            if(err) {
+                console.log(err);
+                client.sendBotNotice(queryRoom.roomId, "Failed to delete last run : " + err);
+                return;
+            } else {
+                db.run("DELETE FROM qc_runs WHERE run_id=?", [row.run_id], function(err) {
+                    if(err) {
+                        console.log(err);
+                        client.sendBotNotice(queryRoom.roomId, "Failed to delete last run : " + err);
+                        return;
+                    } else {
+                        var ds = new Date(row.run_date*1000).toISOString().replace(/T/, ' ').replace(/\..+/, '');
+                        client.sendBotNotice(queryRoom.roomId, "Deleted the run ("+row.wins+" wins) logged on " + ds);
+                    }
+                })
+            }
+        });
     }
     else if(regex.exec(query)) {
         var wins = parseInt(query.substr(4,1));
