@@ -1,0 +1,10 @@
+.vscode
+.idea
+node_modules/
+matrix-bot-config.js
+localstorage/
+*.sqlite
+.DS_Store
+*.log
+*.tmp
+*.swp
