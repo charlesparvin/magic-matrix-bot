@@ -12,10 +12,12 @@ Install all dependancies
 ```
 npm install
 ```
-Then copy `matrix-bot-config.example.js` to `matrix-bot-config.js` and fill all the relevant fields in it
+Copy `matrix-bot-config.example.js` to `matrix-bot-config.js` and fill all the relevant fields in it.
+
 Create the local SQLite3 database (or install sqlite3 first if needed)
 ```
-./create_databases.sh
+chmod +x createdb.sh
+./createdb.sh
 ```
 Then start the bot
 ```

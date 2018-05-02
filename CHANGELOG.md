@@ -1,5 +1,5 @@
 # Changelog for "Magic Matrix" Bot
 
-## Changes in v0.0.1 (2016-11-09)
+## Changes in v0.1.0 (02 May 2018)
 
-- Initial release
+- Initial release with cards/QC stats commands

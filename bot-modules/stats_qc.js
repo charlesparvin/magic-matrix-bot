@@ -78,7 +78,7 @@ exports.runQuery = function(client, query, querySender, queryRoom) {
         });
     }
     else if(query == "undo") {
-        db.run("DELETE FROM qc_runs WHERE ")
+        
     }
     else if(regex.exec(query)) {
         var wins = parseInt(query.substr(4,1));
