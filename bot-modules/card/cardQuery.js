@@ -1,5 +1,6 @@
 var request = require('request');
 var fs = require('fs');
+var config = require('../../matrix-bot-config').base
 
 var method = CardQuery.prototype;
 
