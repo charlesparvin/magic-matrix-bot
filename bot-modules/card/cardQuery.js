@@ -50,8 +50,8 @@ CardQuery.prototype.uploadImage = function(i) {
     const filesize = fs.statSync(fileName).size;
     const stream = fs.createReadStream(fileName);
 
-    let finalUrl = "https://parvin.ovh/_matrix/media/r0/upload";
-    finalUrl += "?access_token="+encodeURIComponent("MDAxOGxvY2F0aW9uIHBhcnZpbi5vdmgKMDAxM2lkZW50aWZpZXIga2V5CjAwMTBjaWQgZ2VuID0gMQowMDI3Y2lkIHVzZXJfaWQgPSBAbWFnaWNib3Q6cGFydmluLm92aAowMDE2Y2lkIHR5cGUgPSBhY2Nlc3MKMDAyMWNpZCBub25jZSA9IF4uO0VOQHdrRjNRNV9uUyoKMDAyZnNpZ25hdHVyZSCiLThroM-2uKUdkk1gSjoZtmrX2Apb0ATcDnC2L32whwo");
+    let finalUrl = config.botBaseUrl + "/_matrix/media/r0/upload";
+    finalUrl += "?access_token="+encodeURIComponent(client.accessToken);
     finalUrl += "&filename=" + encodeURIComponent(this.cardsToSend[i].name+"."+extname);
 
     const options = {  
@@ -65,9 +65,6 @@ CardQuery.prototype.uploadImage = function(i) {
     };
 
     that = this;
-
-    console.log("Sending image " + i)
-      
     request(options, function(err, res, body) {  
       
         if(res === undefined || body === undefined){
@@ -85,9 +82,6 @@ CardQuery.prototype.uploadImage = function(i) {
         }
     
         var json = JSON.parse(body);
-
-        console.log("Successful upload: " + that.cardsToSend[i].name);   
-
         that.setMXC(i, json.content_uri)
     });
 }

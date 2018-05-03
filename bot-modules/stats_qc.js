@@ -6,7 +6,8 @@ var db = new sqlite3.Database(config.sqliteDatabase);
 exports.runQuery = function(client, query, querySender, queryRoom) {
     var params, line;
   
-    var regex = /^add \d{1}$/;
+    var regexViewLogs = /^view\s?(\d{1,2})?$/;
+    var regexAddRun = /^add \d{1}$/;
 
     if(query == "" || query == undefined) {
         console.log("Pulling stats for " + querySender);
@@ -23,9 +24,11 @@ exports.runQuery = function(client, query, querySender, queryRoom) {
                 client.sendBotNotice(queryRoom.roomId, "Failed to retrieve your stats : " + err);
                 return;
             } else {
+                var winValues = [];
                 rows.forEach(function(row) {
                     goldspent += 500;
                     runs++;
+                    winValues.push(row.wins);
 
                     switch(row.wins) {
                         case 0:
@@ -66,8 +69,12 @@ exports.runQuery = function(client, query, querySender, queryRoom) {
                             break;
                     }
                 });
+
+                var averageWins = Math.round(winValues.reduce(function(a, b) { return a + b; })/winValues.length, 2);
+                var medianWins = median(winValues);
                 var netGold = goldwon - goldspent;
-                message = "In " + runs + " runs, " + querySender;
+
+                message = "In " + runs + " runs (Avg wins: "+averageWins+" | Median wins: "+medianWins+"), " + querySender;
                 if(netGold >= 0)
                     message += " won " + netGold + " gold, " + c_unco + " uncommon cards and " + c_rare + " rare cards!";
                 else
@@ -97,8 +104,58 @@ exports.runQuery = function(client, query, querySender, queryRoom) {
             }
         });
     }
-    else if(regex.exec(query)) {
-        var wins = parseInt(query.substr(4,1));
+    else if(m = regexViewLogs.exec(query)) {
+        var nb = parseInt(m[1]) || 10;
+        nb = Math.min(Math.max(nb, 1), 99);
+
+        db.all("SELECT * FROM qc_runs WHERE player=? ORDER BY run_date DESC LIMIT 0,?", [querySender, nb], function(err, rows) {
+            if(err) {
+                console.log(err);
+                client.sendBotNotice(queryRoom.roomId, "Failed to retrieve your stats : " + err);
+                return;
+            } else {
+                var text = querySender+"'s last "+nb+" runs\n";
+                var html = querySender+"'s last "+nb+" runs<table>";
+                rows.forEach(function(row) {
+                    var ds = new Date(row.run_date*1000).toISOString().replace(/T/, ' ').replace(/\..+/, '');
+                    var wins = row.wins;
+                    
+                    var color = '#6e98c1';
+                    if (wins <= 1) {
+                        color = '#EE0000';
+                    } else if (wins <= 3) {
+                        color = 'FF3333';
+                    } else if(wins >= 5) {
+                        color = '#bdd67e';
+                    } else if(wins >= 7) {
+                        color = '#94bc2d';
+                    }
+            
+
+
+                    text += ds + " | " + wins + " wins\n";
+                    html += "<tr><td><font color='"+color+"'>"+ds+"</font></td><td><font color='"+color+"'>"+wins+" wins</font></td></tr>";
+                });
+
+                html += "</table>";
+
+                client.sendBotMessage(queryRoom.roomId, text, html);
+
+                /*
+                var content = {
+                    msgtype: "m.text",
+                    body: text,
+                    format: "org.matrix.custom.html",
+                    formatted_body: html
+                };
+            
+                client.matrixClient.sendMessage(queryRoom.roomId, content);
+                */
+            }
+        });
+    }
+    else if(m = regexAddRun.exec(query)) {
+        var wins = parseInt(m[1]);
         console.log(querySender + " completed a run with " + wins + " wins");
 
         if(wins < 0 || wins > 7) {
@@ -137,4 +194,15 @@ exports.getHelp = function(details) {
            '!qc undo     - Delete last run logged \n' +
            '!qc view <N> - View last N runs (default 10)'
     ;
-  };
+}
+
+function median(values) {
+    values.sort( function(a,b) {return a - b;} );
+
+    var half = Math.floor(values.length/2);
+
+    if(values.length % 2)
+        return values[half];
+    else
+        return (values[half-1] + values[half]) / 2.0;
+}

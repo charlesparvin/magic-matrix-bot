@@ -65,6 +65,7 @@ if(localStorage.getItem('deviceId') === null || localStorage.getItem('accessToke
       localStorage.setItem('userId', res.user_id);
       localStorage.setItem('accessToken', res.access_token);
       localStorage.setItem('deviceId', res.device_id);
+      client.accessToken = res.access_token;
     }, function(err) {
       console.log('An error occured logging in!');
       console.log(err);
