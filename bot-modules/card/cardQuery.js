@@ -44,7 +44,17 @@ CardQuery.prototype.uploadImage = function(i) {
     var extname = this.cardsToSend[i].imageType;
 
     if(!fs.existsSync(fileName)){
-        console.log(fileName + "doesn't exists. Exiting!");
+        this.client.sendBotNotice(this.room, "ERROR: couldn't get source image");
+        return;
+    }
+
+    if (typeof localStorage === "undefined" || localStorage === null) {
+        var LocalStorage = require('node-localstorage').LocalStorage;
+        var localStorage = new LocalStorage(config.localStorage);
+    }
+
+    if(!localStorage || !localStorage.getItem('accessToken')) {
+        this.client.sendBotNotice(this.room, "ERROR: can't load access token");
         return;
     }
 
@@ -52,7 +62,7 @@ CardQuery.prototype.uploadImage = function(i) {
     const stream = fs.createReadStream(fileName);
 
     let finalUrl = config.botBaseUrl + "/_matrix/media/r0/upload";
-    finalUrl += "?access_token="+encodeURIComponent(client.accessToken);
+    finalUrl += "?access_token="+encodeURIComponent(localStorage.getItem('accessToken'));
     finalUrl += "&filename=" + encodeURIComponent(this.cardsToSend[i].name+"."+extname);
 
     const options = {  
