@@ -5,19 +5,38 @@ var crypto = require('crypto')
 exports.runQuery = function(client, query, querySender, queryRoom) {
   var params, line;
 
-  client.mtg.card.where({ 
-    name: query
-  }).then(cards => {
+  
+  if(query.length == 0)
+    return;
+
+  var args = query.split(' ');
+  if(args[0] == "all") {
+    args.shift();
+    search = {name: args.join()}
+  } else if (args[0] == "modern") {
+    args.shift();
+    search = {gameFormat: "Modern", name: args.join()};
+  } else {
+    search = {set: config.standardSets, name: args.join()};
+  }
+
+  search['contains'] = 'imageUrl';
+  search['pageSize'] = 10;
+
+  client.mtg.card.where(search).then(cards => {
     cardsToSend = [];
-    
+    // start from the end to clear duplicates
     for(i=0; i<cards.length && cardsToSend.length < 3; i++) {
       card = cards[i];  
+
+      if(config.filterDuplicates && cardsToSend.filter(c => c.name === card.name).length > 0)
+        continue;
+
       if(card == undefined || card.name == undefined) {
-        client.sendBotNotice(queryRoom.roomId, "Card #"+i+" is undefined");
+       console.log("Card #"+i+" is undefined");
       }
       else if (card.imageUrl == undefined) {
-        console.log(card);
-        client.sendBotNotice(queryRoom.roomId, "Card #"+i+" ("+card.name+") has no imageUrl prop");
+        console.log("Card #"+i+" ("+card.name+") has no imageUrl prop");
       }
       else {
         cardsToSend.push({
@@ -30,7 +49,7 @@ exports.runQuery = function(client, query, querySender, queryRoom) {
       }
     }
 
-    if (cards.length == 0) {      
+    if (cardsToSend.length == 0) {      
       client.sendBotNotice(queryRoom.roomId, "No results for '" + query + "'");
     }
     else {
@@ -41,5 +60,8 @@ exports.runQuery = function(client, query, querySender, queryRoom) {
 };
 
 exports.getHelp = function(details) {
-  return 'You can use !card <partial card name> to search MTG cards.';
+  return '!card <partial card name> searches MTGA cards\n'
+    + '!card std <partial card name> searches standard cards\n'  
+    + '!card modern <partial card name> searches modern cards\n'
+    + '!card all <partial card name> searches all cards';
 };

@@ -1,8 +1,8 @@
 # “MagicMatrix" Bot
 
-MagicMatrix is a bot built with NodeJS for the [Matrix](http://www.matrix.org) chat system based on [hello-matrix-bot](https://gitlab.com/argit/hello-matrix-bot/)
+MagicMatrix is a bot meant to help MTG players (and specifically MTG Arena) using the [Matrix](http://www.matrix.org) chat system 
 
-Tested on Windows 7 and Linux Ubuntu 16.04 LTS with NodeJS v8.11.1 and NPM v5.6.0
+It's built with NodeJS, the code is based on [hello-matrix-bot](https://gitlab.com/argit/hello-matrix-bot/) and it has been successfully tested on Windows 7 and Linux Ubuntu 16.04 LTS with NodeJS v8.11.1 and NPM v5.6.0
 
 # Installation
 
@@ -37,11 +37,14 @@ As usual, `!help` will display all relevant commands within your Matrix channel.
 
 ## Card features
 
-Display cards in the chatroom (this is based on the mtg.io SDK, I'll change it to use Scryfall's API soon)
+Display cards in the chatroom, by default limited to sets available in MTG Arena (configurable in `matrix-bot-config.js`), but std/modern/all prefixes can let you search any card you want. By default (check `matrix-bot-config.js`) duplicate names will get filtered, with the most recent version being shown.
 ```
-!card Black Lotus
+!card <partial name for a MTGA card>
+!card std <partial name for a MODERN card>
+!card modern <partial name for a MODERN card>
+!card all <partial name for ANY card>
 ```
-Cards get cached in the localstorage folder. If there is a problem with a cached card you can clear it with `!clear cache`
+Cards' images get cached in the localStorage folder. If there is a problem with a cached card you can clear it with `!clear cache`
 
 ## Stat-tracking features
 
@@ -51,12 +54,12 @@ You can log your Quick Constructed runs with the following commands, to keep tra
 !qc             View your current stats
 !qc add <X>     Add a run with X wins
 !qc undo        Remove last run saved
+!qc view <X>    View your last X runs (default 10)
 ```
 
-And in a similar way, your draft runs :
+## Draft features
 
+Still under construction!
 ```
-!qd             View your current stats
-!qd add <X>     Add a run with X wins
-!qd undo        Remove last run saved
+!pack <set_acronym>     Generate a 15-card booster pack for that set
 ```
