@@ -10,5 +10,5 @@ exports.base = {
    * CARD SEARCH PARAMETERS
    */
   'filterDuplicates' : true,  
-  'standardSets': 'DOM,AKH,HOU,XLN,RIX' // sets to search with !card
+  'mtgaSets': 'DOM,AKH,HOU,XLN,RIX' // sets to search with !card
 };

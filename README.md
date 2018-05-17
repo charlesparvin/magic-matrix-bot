@@ -43,6 +43,7 @@ Display cards in the chatroom, by default limited to sets available in MTG Arena
 !card std <partial name for a MODERN card>
 !card modern <partial name for a MODERN card>
 !card all <partial name for ANY card>
+!card showsets - shows sets configured for base !card search
 ```
 Cards' images get cached in the localStorage folder. If there is a problem with a cached card you can clear it with `!clear cache`
 

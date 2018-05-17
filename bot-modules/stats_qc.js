@@ -7,7 +7,7 @@ exports.runQuery = function(client, query, querySender, queryRoom) {
     var params, line;
   
     var regexViewLogs = /^view\s?(\d{1,2})?$/;
-    var regexAddRun = /^add \d{1}$/;
+    var regexAddRun = /^add (\d{1})$/;
 
     if(query == "" || query == undefined) {
         console.log("Pulling stats for " + querySender);

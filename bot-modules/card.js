@@ -10,14 +10,17 @@ exports.runQuery = function(client, query, querySender, queryRoom) {
     return;
 
   var args = query.split(' ');
-  if(args[0] == "all") {
+  if(args[0] == "showsets") {
+    client.sendBotNotice(queryRoom.roomId, "I'm current configured to search within the following sets : " + config.mtgaSets)
+  }
+  else if(args[0] == "all") {
     args.shift();
     search = {name: args.join()}
   } else if (args[0] == "modern") {
     args.shift();
     search = {gameFormat: "Modern", name: args.join()};
   } else {
-    search = {set: config.standardSets, name: args.join()};
+    search = {set: config.mtgaSets, name: args.join()};
   }
 
   search['contains'] = 'imageUrl';
@@ -61,7 +64,9 @@ exports.runQuery = function(client, query, querySender, queryRoom) {
 
 exports.getHelp = function(details) {
   return '!card <partial card name> searches MTGA cards\n'
-    + '!card std <partial card name> searches standard cards\n'  
-    + '!card modern <partial card name> searches modern cards\n'
-    + '!card all <partial card name> searches all cards';
+    + '"!card std <partial card name>" searches standard cards\n'  
+    + '"!card modern <partial card name>" searches modern cards\n'
+    + '"!card all <partial card name>" searches all cards\n'
+    + '"!card showsets" shows sets the base !card commands searches within\n'
+  ;
 };
